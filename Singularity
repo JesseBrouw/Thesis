@@ -46,7 +46,8 @@ From: ubuntu:xenial
     /planner/plan-ipc.py \
         $DOMAINFILE \
         $PROBLEMFILE \
-        $PLANFILE
+        $PLANFILE \
+        $--image-from-lifted-task
 
 ## Update the following fields with meta data about your submission.
 ## Please use the same field names and use only one line for each value.

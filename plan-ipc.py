@@ -135,22 +135,20 @@ def determine_and_run_planner(domain, problem, plan, image_from_lifted_task):
     else:
         print_highlighted_line("Done computing an abstract structure graph.")
 
-    print(f'file : {graph_file}')
+    # print_highlighted_line("Selecting planner from learned model...")
+    # selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
+    # if selected_planner is None:
+    #     print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
+    #     return False
+    # else:
+    #     print_highlighted_line("Done selecting planner from learned model.")
 
-    print_highlighted_line("Selecting planner from learned model...")
-    selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
-    if selected_planner is None:
-        print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
-        return False
-    else:
-        print_highlighted_line("Done selecting planner from learned model.")
-
-    print_highlighted_line("Running the selected planner...")
-    # Uncomment the following line for testing running symba.
-    # selected_planner = 'seq-opt-symba-1'
-    run_planner(base_dir, selected_planner)
-    print_highlighted_line("Done running the selected planner.")
-    # Consider any non-crashed planner run as succesful.
+    # print_highlighted_line("Running the selected planner...")
+    # # Uncomment the following line for testing running symba.
+    # # selected_planner = 'seq-opt-symba-1'
+    # run_planner(base_dir, selected_planner)
+    # print_highlighted_line("Done running the selected planner.")
+    # # Consider any non-crashed planner run as succesful.
     return True
 
 if __name__ == "__main__":
@@ -159,12 +157,27 @@ if __name__ == "__main__":
     parser.add_argument("domain_file")
     parser.add_argument("problem_file")
     parser.add_argument("plan_file")
-
+    parser.add_argument(
+        "--image-from-lifted-task", action="store_true",
+        help="If true, create the abstract structure graph based on the PDDL "
+        "description of the task and then create an image from it.")
+    parser.add_argument(
+        "--image-from-grounded-task", action="store_true",
+        help="If true, create the PDG-style graph based on the grounded SAS "
+        "task and then create an image from it.")
 
     args = parser.parse_args()
     domain = args.domain_file
     problem = args.problem_file
     plan = args.plan_file
+    image_from_lifted_task = args.image_from_lifted_task
+    image_from_grounded_task = args.image_from_grounded_task
+    if (image_from_lifted_task and image_from_grounded_task) or (not image_from_lifted_task and not image_from_grounded_task):
+        sys.exit("Please use exactly one of --image-from-lifted-task and --image-from-grounded-task")
 
-    lifted = compute_graph_for_task(domain, problem, plan, True)
-    grounded =  compute_graph_for_task(domain, problem, plan, False)
+    success = determine_and_run_planner(domain, problem, plan, image_from_lifted_task)
+    # if not success:
+    #     print_highlighted_line("Running fallback planner...")
+    #     base_dir = get_base_dir()
+    #     run_planner(base_dir, 'fallback')
+    #     print_highlighted_line("Done running fallback planner.")
