@@ -166,5 +166,5 @@ if __name__ == "__main__":
     problem = args.problem_file
     plan = args.plan_file
 
-    lifted = determine_and_run_planner(domain, problem, plan, True)
-    grounded =  determine_and_run_planner(domain, problem, plan, False)
+    lifted = compute_graph_for_task(domain, problem, plan, True)
+    grounded =  compute_graph_for_task(domain, problem, plan, False)
