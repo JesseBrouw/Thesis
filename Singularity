@@ -29,8 +29,8 @@ From: ubuntu:xenial
     mkdir -p /compiled-planner/src
     mv /Thesis/src/translate/ /compiled-planner/src/
     rm -rf /third-party
-    rm -rf /planner
-    mv /compiled-planner /planner
+    rm -rf /Thesis
+    mv /compiled-planner /Thesis
     apt-get -y autoremove cmake g++ make
 
 
