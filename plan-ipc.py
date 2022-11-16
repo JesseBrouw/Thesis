@@ -42,10 +42,10 @@ def print_highlighted_line(string, block=True):
 def compute_graph_for_task(base_dir, pwd, domain, problem, image_from_lifted_task):
     if image_from_lifted_task:
         command = [sys.executable, os.path.join(base_dir, 'src/translate/abstract_structure_module.py'), '--only-functions-from-initial-state', domain, problem]
-        graph_file = os.path.join(pwd, 'abstract-structure-graph.txt')
+        graph_file = os.path.join(pwd, f'{domain}_{problem}_lifted.txt')
     else:
         command = [sys.executable, os.path.join(base_dir, 'fast-downward.py'), '--build', 'release64', domain, problem, '--symmetries','sym=structural_symmetries(time_bound=0,search_symmetries=oss,dump_symmetry_graph=true,stop_after_symmetry_graph_creation=true)', '--search', 'astar(blind(),symmetries=sym)']
-        graph_file = os.path.join(pwd, 'symmetry-graph.txt')
+        graph_file = os.path.join(pwd, f'{domain}_{problem}_groundeds.txt')
     try:
         subprocess.check_call(command, timeout=GRAPH_CREATION_TIME_LIMIT)
     except subprocess.TimeoutExpired:
