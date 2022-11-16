@@ -85,7 +85,7 @@ def select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
         #raise
 
     # TODO: we should be able to not hard-code the file name
-    image_file_name = '{}.png'.format(graph_file.split(".")[0])
+    image_file_name = '{}.png'.format(graph_file)
     image_path = os.path.join(pwd, image_file_name)
     assert os.path.exists(image_path)
     # # Use the learned model to select the appropriate planner (its command line options)
@@ -135,13 +135,13 @@ def determine_and_run_planner(domain, problem, plan, image_from_lifted_task):
     else:
         print_highlighted_line("Done computing an abstract structure graph.")
 
-    print_highlighted_line("Creating image")
+    print_highlighted_line("Selecting planner from learned model...")
     selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
-    # if selected_planner is None:
-    #     print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
-    #     return False
-    # else:
-    #     print_highlighted_line("Done selecting planner from learned model.")
+    if selected_planner is None:
+        print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
+        return False
+    else:
+        print_highlighted_line("Done selecting planner from learned model.")
 
     # print_highlighted_line("Running the selected planner...")
     # # Uncomment the following line for testing running symba.
@@ -174,9 +174,6 @@ if __name__ == "__main__":
     image_from_grounded_task = args.image_from_grounded_task
     if (image_from_lifted_task and image_from_grounded_task) or (not image_from_lifted_task and not image_from_grounded_task):
         sys.exit("Please use exactly one of --image-from-lifted-task and --image-from-grounded-task")
-    
-    base_dir = get_base_dir()
-    pwd = os.getcwd()
 
     success = determine_and_run_planner(domain, problem, plan, image_from_lifted_task)
     # if not success:
