@@ -135,13 +135,13 @@ def determine_and_run_planner(domain, problem, plan, image_from_lifted_task):
     else:
         print_highlighted_line("Done computing an abstract structure graph.")
 
-    print_highlighted_line("Selecting planner from learned model...")
-    selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
-    if selected_planner is None:
-        print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
-        return False
-    else:
-        print_highlighted_line("Done selecting planner from learned model.")
+    # print_highlighted_line("Selecting planner from learned model...")
+    # selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
+    # if selected_planner is None:
+    #     print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
+    #     return False
+    # else:
+    #     print_highlighted_line("Done selecting planner from learned model.")
 
     # print_highlighted_line("Running the selected planner...")
     # # Uncomment the following line for testing running symba.
