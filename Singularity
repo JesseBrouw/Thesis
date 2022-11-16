@@ -21,8 +21,8 @@ From: ubuntu:xenial
     ## Clean up
     mkdir -p /compiled-planner/builds/release64
     mv /Thesis/driver /compiled-planner
-    mv /Thesis/symba /planner/symba.py /compiled-planner
-    mv /Thesis/fast-downward.py /planner/plan-ipc.py /planner/create-image-from-graph.py /planner/timers.py /compiled-planner
+    mv /Thesis/symba /Thesis/symba.py /compiled-planner
+    mv /Thesis/fast-downward.py /Thesis/plan-ipc.py /Thesis/create-image-from-graph.py /Thesis/timers.py /compiled-planner
     mv /Thesis/dl_model /compiled-planner
     rm -rf /compiled-planner/dl_model/model_creation /compiled-planner/dl_model/model.h5 /compiled-planner/dl_model/model.json
     mv /Thesis/builds/release64/bin /compiled-planner/builds/release64
