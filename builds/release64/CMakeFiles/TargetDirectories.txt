@@ -1,9 +1,0 @@
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/CMakeFiles/translate.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/CMakeFiles/edit_cache.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/CMakeFiles/rebuild_cache.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/search/CMakeFiles/downward.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/search/CMakeFiles/edit_cache.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/search/CMakeFiles/rebuild_cache.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/h2-preprocessor/CMakeFiles/preprocess.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/h2-preprocessor/CMakeFiles/edit_cache.dir
-/Users/jessebrouwers/Desktop/KI/Afstudeerproject/Project/team23/builds/release64/h2-preprocessor/CMakeFiles/rebuild_cache.dir
