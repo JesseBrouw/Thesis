@@ -42,10 +42,10 @@ def print_highlighted_line(string, block=True):
 def compute_graph_for_task(base_dir, pwd, domain, problem, image_from_lifted_task):
     if image_from_lifted_task:
         command = [sys.executable, os.path.join(base_dir, 'src/translate/abstract_structure_module.py'), '--only-functions-from-initial-state', domain, problem]
-        graph_file = os.path.join(pwd, f'{domain}_{problem}_lifted.txt')
+        graph_file = os.path.join(pwd, '{}_{}_lifted.txt'.format(domain, problem))
     else:
         command = [sys.executable, os.path.join(base_dir, 'fast-downward.py'), '--build', 'release64', domain, problem, '--symmetries','sym=structural_symmetries(time_bound=0,search_symmetries=oss,dump_symmetry_graph=true,stop_after_symmetry_graph_creation=true)', '--search', 'astar(blind(),symmetries=sym)']
-        graph_file = os.path.join(pwd, f'{domain}_{problem}_groundeds.txt')
+        graph_file = os.path.join(pwd, '{}_{}_grounded.txt'.format(domain, problem))
     try:
         subprocess.check_call(command, timeout=GRAPH_CREATION_TIME_LIMIT)
     except subprocess.TimeoutExpired:
@@ -85,18 +85,18 @@ def select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
         #raise
 
     # TODO: we should be able to not hard-code the file name
-    image_file_name = 'graph-gs-L-bolded-cs.png'
+    image_file_name = '{}.png'.format(graph_file.split(".")[0])
     image_path = os.path.join(pwd, image_file_name)
     assert os.path.exists(image_path)
-    # Use the learned model to select the appropriate planner (its command line options)
-    if image_from_lifted_task:
-        model_subfolder = 'lifted'
-    else:
-        model_subfolder = 'grounded'
-    json_model = os.path.join(base_dir, 'dl_model', 'models', model_subfolder, 'model.json')
-    h5_model = os.path.join(base_dir, 'dl_model', 'models', model_subfolder, 'model.h5')
-    selected_algorithm = selector.select_algorithm_from_model(json_model, h5_model, image_path)
-    return selected_algorithm
+    # # Use the learned model to select the appropriate planner (its command line options)
+    # if image_from_lifted_task:
+    #     model_subfolder = 'lifted'
+    # else:
+    #     model_subfolder = 'grounded'
+    # json_model = os.path.join(base_dir, 'dl_model', 'models', model_subfolder, 'model.json')
+    # h5_model = os.path.join(base_dir, 'dl_model', 'models', model_subfolder, 'model.h5')
+    # selected_algorithm = selector.select_algorithm_from_model(json_model, h5_model, image_path)
+    # return selected_algorithm
 
 
 def build_planner_from_command_line_options(base_dir, command_line_options, use_h2_preprocessor):
@@ -135,8 +135,8 @@ def determine_and_run_planner(domain, problem, plan, image_from_lifted_task):
     else:
         print_highlighted_line("Done computing an abstract structure graph.")
 
-    # print_highlighted_line("Selecting planner from learned model...")
-    # selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
+    print_highlighted_line("Creating image")
+    selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
     # if selected_planner is None:
     #     print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
     #     return False
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     base_dir = get_base_dir()
     pwd = os.getcwd()
 
-    success = compute_graph_for_task(base_dir, pwd,domain, problem, plan, image_from_lifted_task)
+    success = determine_and_run_planner(domain, problem, plan, image_from_lifted_task)
     # if not success:
     #     print_highlighted_line("Running fallback planner...")
     #     base_dir = get_base_dir()
