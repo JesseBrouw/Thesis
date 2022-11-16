@@ -174,8 +174,11 @@ if __name__ == "__main__":
     image_from_grounded_task = args.image_from_grounded_task
     if (image_from_lifted_task and image_from_grounded_task) or (not image_from_lifted_task and not image_from_grounded_task):
         sys.exit("Please use exactly one of --image-from-lifted-task and --image-from-grounded-task")
+    
+    base_dir = get_base_dir()
+    pwd = os.getcwd()
 
-    success = determine_and_run_planner(domain, problem, plan, image_from_lifted_task)
+    success = compute_graph_for_task(base_dir, pwd,domain, problem, plan, image_from_lifted_task)
     # if not success:
     #     print_highlighted_line("Running fallback planner...")
     #     base_dir = get_base_dir()
