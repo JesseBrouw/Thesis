@@ -8,26 +8,26 @@ From: ubuntu:xenial
     rm -rf /var/lib/apt/lists/*
 
     ## Get the sources and install pip dependencies.
-    git clone https://github.com/JesseBrouw/Thesis.git /planner
-    cd /planner
+    git clone https://github.com/JesseBrouw/Thesis.git
+    cd /Thesis
     pip install -r requirements.txt
 
     ## Build your planner
-    cd /planner
+    cd /Thesis
     ./build.py release64 -j4
-    cd /planner/symba
+    cd /Thesis/symba
     ./build -j4
 
     ## Clean up
     mkdir -p /compiled-planner/builds/release64
-    mv /planner/driver /compiled-planner
-    mv /planner/symba /planner/symba.py /compiled-planner
-    mv /planner/fast-downward.py /planner/plan-ipc.py /planner/create-image-from-graph.py /planner/timers.py /compiled-planner
-    mv /planner/dl_model /compiled-planner
+    mv /Thesis/driver /compiled-planner
+    mv /Thesis/symba /planner/symba.py /compiled-planner
+    mv /Thesis/fast-downward.py /planner/plan-ipc.py /planner/create-image-from-graph.py /planner/timers.py /compiled-planner
+    mv /Thesis/dl_model /compiled-planner
     rm -rf /compiled-planner/dl_model/model_creation /compiled-planner/dl_model/model.h5 /compiled-planner/dl_model/model.json
-    mv /planner/builds/release64/bin /compiled-planner/builds/release64
+    mv /Thesis/builds/release64/bin /compiled-planner/builds/release64
     mkdir -p /compiled-planner/src
-    mv /planner/src/translate/ /compiled-planner/src/
+    mv /Thesis/src/translate/ /compiled-planner/src/
     rm -rf /third-party
     rm -rf /planner
     mv /compiled-planner /planner
@@ -43,14 +43,14 @@ From: ubuntu:xenial
     PLANFILE=$3
 
     ## Call your planner.
-    /planner/plan-ipc.py \
+    /Thesis/plan-ipc.py \
         $DOMAINFILE \
         $PROBLEMFILE \
         $PLANFILE \
         --image-from-lifted-task
     
     ## Call your planner.
-    /planner/plan-ipc.py \
+    /Thesis/plan-ipc.py \
         $DOMAINFILE \
         $PROBLEMFILE \
         $PLANFILE \
