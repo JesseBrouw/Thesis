@@ -29,7 +29,7 @@ if __name__ == '__main__':
             process = subprocess.Popen(['cp', filepath, './'])
             process.wait()
 
-            process = subprocess.Popen(['sudo', 'singularity', 'run', 'H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
+            process = subprocess.Popen(['sudo', 'singularity', 'run', '-H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
             process.wait()
 
             process = subprocess.Popen(['mkdir' '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
