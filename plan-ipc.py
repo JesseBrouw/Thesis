@@ -135,8 +135,8 @@ def determine_and_run_planner(domain, problem, plan, image_from_lifted_task):
     else:
         print_highlighted_line("Done computing an abstract structure graph.")
 
-    print_highlighted_line("Creating png image")
-    selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
+    # print_highlighted_line("Creating png image")
+    # selected_planner = select_planner_from_model(base_dir, pwd, graph_file, image_from_lifted_task)
     # if selected_planner is None:
     #     print_highlighted_line("Image creation or selection from model failed, using fallback planner!")
     #     return False
