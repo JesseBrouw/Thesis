@@ -26,24 +26,17 @@ if __name__ == '__main__':
         for problem in files:
             # copy problem file to current directory (where singularity resides)
             filepath = os.path.join(domain_path, problem)
-            process = subprocess.Popen(['cp', filepath, './'])
-            process.wait()
-            
-            print(os.listdir(os.getcwd()))
-            process = subprocess.Popen(['sudo', 'singularity', 'run', '-H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
-            process.wait()
+            process = subprocess.check_call(['cp', filepath, './'])
 
-            process = subprocess.Popen(['mkdir', '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
-            process.wait()
-            process = subprocess.Popen(['mv', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
-            process.wait()
-            process = subprocess.Popen(['mv', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
-            process.wait()
+            process = subprocess.check_call(['sudo', 'singularity', 'run', '-H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
 
-            process = subprocess.Popen(['rm', problem])
-            process.wait()
-            process = subprocess.Popen(['rm', domain_file])
-            process.wait()
+            process = subprocess.check_call(['mkdir', '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process = subprocess.check_call(['mv', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process = subprocess.check_call(['mv', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+
+            process = subprocess.check_call(['rm', problem])
+            process = subprocess.check_call(['rm', domain_file])
+
     else:
         print('Domain {} has multiple domain files!'.format())
 
