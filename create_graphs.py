@@ -1,15 +1,54 @@
 import os
+import sys
 # subprocess is used to write bash cmommands
 import subprocess
+import time
 
-# script that loops through the directories in classical-domains.
+# Script that targets one given domain an
 if __name__ == '__main__':
-    planning_dir = os.getcwd() + '/classical-domains/classical'
-    
-    for subdir, dirs, files in os.walk(planning_dir):
-        for dir in dirs:
-            print(f'Directory {dir} has the following files : ')
-            for file in os.listdir(planning_dir + '/' + dir):
-                print(file)
+    target_domain = sys.argv[1]
+    domain_path = os.getcwd() + '/classical/' + target_domain
+
+    files = os.listdir(domain_path)
+    # filter out all the pddl files
+    files = list(filter(lambda x: x.split(".")[1] == 'pddl', files))
+    # filter out domain.pddl file (directories with 1 domain for all problems)
+    is_domain = lambda x: x.split(".")[0] == "domain"
+    one_domain = list(filter(is_domain, files))
+
+    if one_domain:
+        domain_file = 'domain.pddl'
+        files.remove('domain.pddl')
+        # copy domain input file to current directory (where singularity resides)
+        process = subprocess.Popen(['cp', os.path.join(domain_path, domain_file), './'])
+        process.wait()
+        
+        for problem in files:
+            # copy problem file to current directory (where singularity resides)
+            filepath = os.path.join(domain_path, problem)
+            process = subprocess.Popen(['cp', filepath, './'])
+            process.wait()
+
+            process = subprocess.Popen(['sudo', 'singularity', 'run', 'H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
+            process.wait()
+
+            process = subprocess.Popen(['mkdir' '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process.wait()
+            process = subprocess.Popen(['cp', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process.wait()
+            process = subprocess.Popen(['cp', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process.wait()
+
+            process = subprocess.Popen(['rm', problem])
+            process.wait()
+            process = subprocess.Popen(['rm', domain_file])
+            process.wait()
+    else:
+        print('Domain {} has multiple domain files!'.format())
+
+
+        
+
+
 
 
