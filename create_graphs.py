@@ -34,9 +34,9 @@ if __name__ == '__main__':
 
             process = subprocess.Popen(['mkdir' '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
             process.wait()
-            process = subprocess.Popen(['cp', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process = subprocess.Popen(['mv', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
             process.wait()
-            process = subprocess.Popen(['cp', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process = subprocess.Popen(['mv', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
             process.wait()
 
             process = subprocess.Popen(['rm', problem])
