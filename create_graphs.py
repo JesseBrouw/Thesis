@@ -41,8 +41,9 @@ if __name__ == '__main__':
             process.wait()
             process = subprocess.Popen(['rm', problem])
             process.wait()
-            process = subprocess.Popen(['rm', domain_file])
-            process.wait()
+        
+        process = subprocess.Popen(['rm', domain_file])
+        process.wait()
 
     else:
         print('Domain {} has multiple domain files!'.format())
