@@ -28,7 +28,8 @@ if __name__ == '__main__':
             filepath = os.path.join(domain_path, problem)
             process = subprocess.Popen(['cp', filepath, './'])
             process.wait()
-
+            
+            print(os.listdir(os.getcwd()))
             process = subprocess.Popen(['sudo', 'singularity', 'run', '-H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
             process.wait()
 
