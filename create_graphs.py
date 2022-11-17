@@ -32,7 +32,7 @@ if __name__ == '__main__':
             print(domain_file, problem)
             process = subprocess.Popen(['sudo', 'singularity', 'run', '-H', '$(pwd)', '-C', domain_file, problem, 'x.txt'])
             process.wait()
-
+            time.sleep(1)
             process = subprocess.Popen(['mkdir', '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
             process.wait()
             process = subprocess.Popen(['mv', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
