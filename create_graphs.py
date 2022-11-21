@@ -6,6 +6,7 @@ import time
 
 # Script that targets one given domain an
 if __name__ == '__main__':
+    begin = time.time()
     target_domain = sys.argv[1]
     domain_path = os.getcwd() + '/classical/' + target_domain
 
@@ -22,6 +23,8 @@ if __name__ == '__main__':
         # copy domain input file to current directory (where singularity resides)
         process = subprocess.Popen(['cp', os.path.join(domain_path, domain_file), './'])
         process.wait()
+        process = subprocess.Popen(['mkdir', '{}'.format(target_domain)])
+        process.wait()
         
         for problem in files:
             # copy problem file to current directory (where singularity resides)
@@ -32,18 +35,18 @@ if __name__ == '__main__':
             print(domain_file, problem)
             process = subprocess.Popen(['sudo', 'singularity', 'run', '-H', os.getcwd(), '-C', 'graphs.sif', domain_file, problem, 'x.txt'])
             process.wait()
-            time.sleep(1)
-            process = subprocess.Popen(['mkdir', '{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            time.sleep(0.5)
+            process = subprocess.Popen(['mv', 'abstract-structure-graph.txt', '{}.txt'.format(problem)])
             process.wait()
-            process = subprocess.Popen(['mv', 'abstract-structure-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
-            process.wait()
-            process = subprocess.Popen(['mv', 'symmetry-graph.txt', './{}_{}_{}'.format(target_domain, domain_file.split(".")[0], problem.split(".")[0])])
+            process = subprocess.Popen(['mv', '{}.txt'.format(problem), './{}'.format(target_domain)])
             process.wait()
             process = subprocess.Popen(['rm', problem])
             process.wait()
         
         process = subprocess.Popen(['rm', domain_file])
         process.wait()
+
+        print(f"Creating all graphs took {time.time() - begin} seconds.")
 
     else:
         print('Domain {} has multiple domain files!'.format())
