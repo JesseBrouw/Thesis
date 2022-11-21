@@ -560,11 +560,13 @@ if __name__ == "__main__":
         adjacency_graph = []
         node_counter = 0
         vertex_indices = {}
+        vertex_colors = {}
         for vertex in graph.graph.get_vertices():
             if hide_equal_predicates and vertex in graph.graph.excluded_vertices:
                 continue
             vertex_indices[vertex] = node_counter
-            adjacency_graph.append([])
+            vertex_indices[node_counter] = graph.graph.get_color(vertex)
+            adjacency_graph.append([graph.graph.get_color(vertex)])
             node_counter += 1
         for edge in graph.graph.edges:
             assert type(edge) is tuple
