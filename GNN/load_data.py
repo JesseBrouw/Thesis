@@ -5,7 +5,11 @@ import numpy as np
 
 def load_data(target:str):
     """
-
+        Function which gets a target csv file as parameter
+        and returns a train, val, test split. 
+        
+        There are two possibilities : Use one specific
+        domain, or use multiple domains. 
     """
     file_path = os.path.join(os.getcwd(), 'GNN_data', target)
 
