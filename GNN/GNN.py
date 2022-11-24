@@ -11,6 +11,8 @@ from load_data import load_data
 
 # TODO: Make alterations such that it can run on a CUDA device when available.
 
+torch.manual_seed(1)
+
 class GNN(torch.nn.Module):
     def __init__(self, dim, n_iter):
         """
