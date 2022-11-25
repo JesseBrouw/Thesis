@@ -14,8 +14,10 @@ from load_data import load_data
 # TODO: Make alterations such that it can run on a CUDA device when available.
 
 torch.manual_seed(1)
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 def main(argument:str):
+    print(f'Device : {device}')
     N_ITER = 2              # number of message passing iterations
     GNN_DIM = 15            # amount of node labels
     LEARNING_RATE = 0.001   # learning rate of the optimizer
@@ -25,20 +27,20 @@ def main(argument:str):
     (X_train, y_train), (X_val, y_val), (X_test, y_test) = load_data(argument)
 
     # Get the labels and adjacency matrices from the json strings in the dataframe
-    labels_train, adj_train = zip(*(parse_graph(json_str) for json_str in X_train['graph']))
-    labels_val, adj_val = zip(*(parse_graph(json_str) for json_str in X_val['graph']))
-    labels_test, adj_test = zip(*(parse_graph(json_str) for json_str in X_test['graph']))
+    labels_train, adj_train = zip(*(parse_graph(json_str, device) for json_str in X_train['graph']))
+    labels_val, adj_val = zip(*(parse_graph(json_str, device) for json_str in X_val['graph']))
+    labels_test, adj_test = zip(*(parse_graph(json_str, device) for json_str in X_test['graph']))
 
     # Extract the hand-crafted features from the dataframe. 
-    features_train = get_features(X_train)
-    features_val = get_features(X_val)
-    features_test = get_features(X_test)
+    features_train = get_features(X_train).to(device=device)
+    features_val = get_features(X_val).to(device=device)
+    features_test = get_features(X_test).to(device=device)
 
     # Compute the dimension of the Predictor dimension
     nn_dim = features_train.shape[1] + GNN_DIM
 
     # instantiate model
-    model = NN_Modules.GraphPredictor(GNN_DIM, nn_dim, N_ITER)
+    model = NN_Modules.GraphPredictor(GNN_DIM, nn_dim, N_ITER).to(device=device)
     # instantiate optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 

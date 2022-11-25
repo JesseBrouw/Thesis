@@ -78,7 +78,7 @@ class GraphPredictor(torch.nn.Module):
         return self.predictor(pooled, features)
 
 
-def parse_graph(graph_string:str):
+def parse_graph(graph_string:str, device):
     """
         Parse input json string to graph representation
         by returning the one hot encodings of all the 
@@ -98,7 +98,7 @@ def parse_graph(graph_string:str):
     for idx, label in enumerate(labels):
         one_hot_encodings[idx, label] = 1
 
-    return one_hot_encodings, adjacency
+    return one_hot_encodings.to(device=device), adjacency.to(device=device)
 
 def get_features(df:pd.DataFrame) -> torch.Tensor:
     """
