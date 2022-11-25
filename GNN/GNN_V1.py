@@ -88,10 +88,6 @@ def main(argument:str):
                 predictions.append(round(out.item()))
 
         return classification_report(y, np.array(predictions)), np.array(predictions)
-    
-    print("Before training:")
-    print("Train report \n", report(labels_train, adj_train, features_train, y_train)[0])
-    print("Valid report \n", report(labels_val, adj_val, features_val, y_val)[0])
 
     for epoch in range(EPOCHS):
         print(f"Epoch {epoch}")
@@ -112,7 +108,7 @@ if __name__ == '__main__':
 
     if to_file == 'True':
         orig_stdout = sys.stdout
-        with open('experiment.txt', 'w') as wf:
+        with open(f'./Results/exp_{sys.argv[0].split(".")[0]}_{arg.split(".")[0]}.txt', 'w') as wf:
             with redirect_stdout(wf):
                 main(arg)
     else:
