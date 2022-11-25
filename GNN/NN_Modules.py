@@ -1,21 +1,12 @@
-import tqdm
 import torch
-import pandas as pd
-import sys
-import json
-from tqdm import tqdm
-from sklearn.metrics import classification_report
 import numpy as np
-
-from load_data import load_data
-
-# TODO: Make alterations such that it can run on a CUDA device when available.
-
-torch.manual_seed(1)
+import pandas as pd
+import json
 
 class GNN(torch.nn.Module):
     def __init__(self, dim, n_iter):
         """
+            **V1**
             Pytorch module which contains a standard Graph Neural Network,
             which only performs simple message passing, without reduction
             of size. 
@@ -44,6 +35,7 @@ class GNN(torch.nn.Module):
 
 class Predictor(torch.nn.Module):
     """
+         **V1**
         Pytorch module which contains the Feedforward neural 
         network, which outputs a prediction given the computed
         graph representation of the GNN plus the hand-crafted
@@ -62,6 +54,7 @@ class Predictor(torch.nn.Module):
 
 class GraphPredictor(torch.nn.Module):
     """
+         **V1**
         Module which ties everything together.
         First computes the graph representation of the problem instance
         and feeds this input to the Predictor module together with the
@@ -83,6 +76,7 @@ class GraphPredictor(torch.nn.Module):
         # pooled, _ = torch.max(labels_encoded, dim=-2)
         pooled = torch.mean(labels_encoded, dim=0) # yields best results
         return self.predictor(pooled, features)
+
 
 def parse_graph(graph_string:str):
     """
@@ -115,96 +109,4 @@ def get_features(df:pd.DataFrame) -> torch.Tensor:
 
     return torch.from_numpy(features)
 
-
-def main(argument:str):
-    N_ITER = 2              # number of message passing iterations
-    GNN_DIM = 15            # amount of node labels
-    LEARNING_RATE = 0.001   # learning rate of the optimizer
-    EPOCHS = 30             # number of epochs over the data
-
-    # load the data
-    (X_train, y_train), (X_val, y_val), (X_test, y_test) = load_data(argument)
-
-    # Get the labels and adjacency matrices from the json strings in the dataframe
-    labels_train, adj_train = zip(*(parse_graph(json_str) for json_str in X_train['graph']))
-    labels_val, adj_val = zip(*(parse_graph(json_str) for json_str in X_val['graph']))
-    labels_test, adj_test = zip(*(parse_graph(json_str) for json_str in X_test['graph']))
-
-    # Extract the hand-crafted features from the dataframe. 
-    features_train = get_features(X_train)
-    features_val = get_features(X_val)
-    features_test = get_features(X_test)
-
-    # Compute the dimension of the Predictor dimension
-    nn_dim = features_train.shape[1] + GNN_DIM
-
-    # instantiate model
-    model = GraphPredictor(GNN_DIM, nn_dim, N_ITER)
-    # instantiate optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
-    def train_pass(labels, adjacency, features, y):
-        """
-            computes one train pass over the data
-        """
-        # Set module to training mode
-        model.train()
-        loss_function = torch.nn.BCELoss()
-
-        # permuate the training data randomly
-        indices = torch.randperm(len(y))
-
-        total_loss = 0
-        for idx in tqdm(indices):
-            labeli, adji, feati, yi = labels[idx], adjacency[idx], features[idx], y[idx]
-
-            # compute output
-            optimizer.zero_grad()
-            out = model(labeli, adji, feati)
-            out = out.squeeze()
-
-            # compute loss
-            loss = loss_function(out, torch.tensor(yi, dtype=torch.float32))
-            total_loss += loss
-
-            # perform backward pass
-            loss.backward()
-            optimizer.step()
-
-        return total_loss / len(y)
-
-    def report(labels, adjacency, features, y):
-        """
-        Compute classification report, and return predictions.
-        """
-        with torch.no_grad():
-            model.eval()
-
-            predictions = []
-            for labeli, adji, feati, yi in tqdm(zip(labels, adjacency, features, y)):
-                out = model(labeli, adji, feati)
-                predictions.append(round(out.item()))
-
-        return classification_report(y, np.array(predictions)), np.array(predictions)
-    
-    print("Before training:")
-    print("Train report \n", report(labels_train, adj_train, features_train, y_train)[0])
-    print("Valid report \n", report(labels_val, adj_val, features_val, y_val)[0])
-
-    for epoch in range(EPOCHS):
-        print(f"Epoch {epoch}")
-        train_loss = train_pass(labels_train, adj_train, features_train, y_train)
-        print(f"Training BCE loss \n {train_loss}")
-        val_report = report(labels_val, adj_val, features_val, y_val)[0]
-        print(f"Valid report \n {val_report}")
-    
-    test_report, predictions = report(labels_test, adj_test, features_test, y_test)
-    print(f"Test report : \n {test_report}")
-    print("actual / predictions : ")
-    for y, pred in zip(y_test, predictions):
-        print((y,pred))
-
-
-if __name__ == '__main__':
-    main(sys.argv[1])
 
