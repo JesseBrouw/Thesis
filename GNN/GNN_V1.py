@@ -106,5 +106,17 @@ def main(argument:str):
         print((y,pred))
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    arg = sys.argv[1]
+    to_file = sys.argv[2]
+    
+    if to_file == 'True':
+        orig_stdout = sys.stdout
+        file = open(f'experiment_{arg}.txt', 'w')
+
+        sys.stdout = file
+    main(arg)
+
+    if to_file == 'True':
+        sys.stdout = orig_stdout
+        file.close()
 
