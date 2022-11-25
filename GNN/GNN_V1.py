@@ -5,6 +5,7 @@ import json
 from tqdm import tqdm
 from sklearn.metrics import classification_report
 import numpy as np
+from contextlib import redirect_stdout
 
 import NN_Modules
 from NN_Modules import parse_graph, get_features
@@ -108,15 +109,13 @@ def main(argument:str):
 if __name__ == '__main__':
     arg = sys.argv[1]
     to_file = sys.argv[2]
-    
+
     if to_file == 'True':
         orig_stdout = sys.stdout
-        file = open(f'experiment_{arg}.txt', 'w')
+        with open('experiment.txt', 'w') as wf:
+            with redirect_stdout(wf):
+                main(arg)
+    else:
+        main(arg)
 
-        sys.stdout = file
-    main(arg)
-
-    if to_file == 'True':
-        sys.stdout = orig_stdout
-        file.close()
 
