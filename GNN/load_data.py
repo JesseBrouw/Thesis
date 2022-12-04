@@ -2,13 +2,18 @@ import os
 import pandas as pd
 import numpy as np
 
-def load_data(target:str):
+def load_data(target:str, task:str):
     """
         Function which gets a target csv file as parameter
         and returns a train, val, test split. 
         
         There are two possibilities : Use one specific
         domain, or use multiple domains. 
+
+        For the task there are also 2 possibilities. 
+        either 'classification' or 'regression', where
+        classification tackles the sol/usnol problem and
+        regression, regresses the runtime
     """
     file_path = os.path.join(os.getcwd(), 'GNN_data', target)
 
@@ -23,13 +28,12 @@ def load_data(target:str):
         val = df[df['problem'].isin(problems[train_split:train_split+valid_split])]
         test = df[df['problem'].isin(problems[train_split+valid_split:])]
 
-        def extract_xy(df:pd.DataFrame):
-            y = df['coverage'].to_numpy()
-            x = df.drop(columns=['coverage', 'domain', 'problem'])
-
+        def extract_xy(df:pd.DataFrame, task):
+            y = df['coverage'].to_numpy() if task=='classification' else df['total_time'].to_numpy(dtype=float) 
+            x = df.drop(columns=['coverage', 'total_time', 'problem'])
             return x, y
         
-        return extract_xy(train), extract_xy(val), extract_xy(test)
+        return extract_xy(train, task), extract_xy(val, task), extract_xy(test, task)
     
     else:
         domains = list(df['domain'].unique())
@@ -54,8 +58,8 @@ def load_data(target:str):
             test = domain_df[domain_df['problem'].isin(problems[train_split+valid_split:])]
 
             def extract_xy(df:pd.DataFrame):
-                y = df['coverage'].to_numpy()
-                x = df.drop(columns=['coverage', 'domain', 'problem'])
+                y = df['coverage'].to_numpy() if task=='classification' else df['total_time'].to_numpy(dtype=float) 
+                x = df.drop(columns=['coverage', 'total_time', 'problem'])
 
                 return x, y
             

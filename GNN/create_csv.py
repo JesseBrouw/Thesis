@@ -17,7 +17,7 @@ def main(file):
         print(domain)
         # create copy of dataframe containing only that specific domain
         copy = df.loc[df['domain'] == domain].copy()
-        copy = copy[['domain', 'problem', 'horizon', 'coverage']]
+        copy = copy[['domain', 'problem', 'horizon', 'coverage', 'total_time']]
 
         # remove trailing .pddl from the problem name
         copy['problem'] = copy['problem'].apply(lambda x: x.split(".")[0])
