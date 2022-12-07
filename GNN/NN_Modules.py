@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import json
 
-class GNN(torch.nn.Module):
+class GNNV1(torch.nn.Module):
     def __init__(self, dim, n_iter):
         """
             **V1**
@@ -33,7 +33,7 @@ class GNN(torch.nn.Module):
         update = labels
         return update
 
-class Predictor(torch.nn.Module):
+class PredictorV1(torch.nn.Module):
     """
          **V1**
         Pytorch module which contains the Feedforward neural 
@@ -56,7 +56,7 @@ class Predictor(torch.nn.Module):
             out = torch.relu(self.fc1(torch.concat((gnn_out, features))))
         return out
 
-class GraphClassifier(torch.nn.Module):
+class GraphClassifierV1(torch.nn.Module):
     """
          **V1**
         Module which ties everything together.
@@ -69,8 +69,8 @@ class GraphClassifier(torch.nn.Module):
     """
     def __init__(self, gnn_dim, nn_dim, n_iter):
         super().__init__()
-        self.gnn = GNN(dim=gnn_dim, n_iter=n_iter)
-        self.predictor = Predictor(nn_dim)
+        self.gnn = GNNV1(dim=gnn_dim, n_iter=n_iter)
+        self.predictor = PredictorV1(nn_dim)
 
     # Forward pass which encodes the graph, pools the entire graph
     # to one vector representing the entire graph, and passes this
@@ -78,10 +78,36 @@ class GraphClassifier(torch.nn.Module):
     def forward(self, labels, adj, features):
         labels_encoded = self.gnn(labels, adj)
         # pooled, _ = torch.max(labels_encoded, dim=-2)
-        pooled = torch.mean(labels_encoded, dim=0) # yields best results
+        pooled = torch.mean(labels_encoded, dim=0)
         return self.predictor(pooled, features)
 
-class GraphRegressor(torch.nn.Module):
+class GraphClassifierV2(torch.nn.Module):
+    """
+         **V2**
+        Same as V1, but implements attention as pooling method instead of 
+        mean pooling. 
+    """
+    def __init__(self, gnn_dim, nn_dim, n_iter):
+        super().__init__()
+        self.gnn = GNNV1(dim=gnn_dim, n_iter=n_iter)
+        self.predictor = PredictorV1(nn_dim)
+        self.context = torch.tensor(torch.randn(gnn_dim), requires_grad=True)
+    
+    def attention(self, embeddings):
+        weights = torch.exp(torch.matmul(embeddings, self.context))
+        weights = weights/torch.sum(weights)
+        return torch.sum(torch.mul(weights, embeddings.T), axis=1)
+
+    # Forward pass which encodes the graph, pools the entire graph
+    # to one vector representing the entire graph, and passes this
+    # to the predictor together with the hand crafted features. 
+    def forward(self, labels, adj, features):
+        labels_encoded = self.gnn(labels, adj)
+        # pooled, _ = torch.max(labels_encoded, dim=-2)
+        pooled = self.attention(labels_encoded)
+        return self.predictor(pooled, features)
+
+class GraphRegressorV1(torch.nn.Module):
     """
          **V1**
         Module which ties everything together.
@@ -94,8 +120,8 @@ class GraphRegressor(torch.nn.Module):
     """
     def __init__(self, gnn_dim, nn_dim, n_iter):
         super().__init__()
-        self.gnn = GNN(dim=gnn_dim, n_iter=n_iter)
-        self.predictor = Predictor(nn_dim, False)
+        self.gnn = GNNV1(dim=gnn_dim, n_iter=n_iter)
+        self.predictor = PredictorV1(nn_dim, False)
 
     # Forward pass which encodes the graph, pools the entire graph
     # to one vector representing the entire graph, and passes this
@@ -103,7 +129,38 @@ class GraphRegressor(torch.nn.Module):
     def forward(self, labels, adj, features):
         labels_encoded = self.gnn(labels, adj)
         # pooled, _ = torch.max(labels_encoded, dim=-2)
-        pooled = torch.mean(labels_encoded, dim=0) # yields best results
+        pooled = torch.mean(labels_encoded, dim=0) 
+        return self.predictor(pooled, features)
+
+class GraphRegressorV2(torch.nn.Module):
+    """
+         **V2**
+        Module which ties everything together.
+        First computes the graph representation of the problem instance
+        and feeds this input to the Predictor module together with the
+        hand-crafted graph features. 
+
+        - gnn_dim = Size of encoding vector of labels
+        - nn_dim = Size of output_GNN + #hand-crafted-features
+    """
+    def __init__(self, gnn_dim, nn_dim, n_iter):
+        super().__init__()
+        self.gnn = GNNV1(dim=gnn_dim, n_iter=n_iter)
+        self.predictor = PredictorV1(nn_dim, False)
+        self.context = torch.tensor(torch.randn(gnn_dim), requires_grad=True)
+    
+    def attention(self, embeddings):
+        weights = torch.exp(torch.matmul(embeddings, self.context))
+        weights = weights/torch.sum(weights)
+        return torch.sum(torch.mul(weights, embeddings.T), axis=1)
+
+    # Forward pass which encodes the graph, pools the entire graph
+    # to one vector representing the entire graph, and passes this
+    # to the predictor together with the hand crafted features. 
+    def forward(self, labels, adj, features):
+        labels_encoded = self.gnn(labels, adj)
+        # pooled, _ = torch.max(labels_encoded, dim=-2)
+        pooled = self.attention(labels_encoded)
         return self.predictor(pooled, features)
 
 
@@ -133,7 +190,10 @@ def get_features(df:pd.DataFrame) -> torch.Tensor:
     """
         Get tensors out of the hand-crarfted graph features
     """
-    feature_df = df.drop(columns=['graph', 'domain'])
+    try:
+        feature_df = df.drop(columns=['graph', 'domain', 'problem'])
+    except:
+        feature_df = df.drop(columns=['graph', 'domain'])
     features = feature_df.to_numpy()
 
     return torch.from_numpy(features)

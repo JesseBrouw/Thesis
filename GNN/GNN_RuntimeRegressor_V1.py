@@ -10,6 +10,7 @@ from contextlib import redirect_stdout
 import NN_Modules
 from NN_Modules import parse_graph, get_features
 from load_data import load_data
+import metrics
 
 
 # TODO: Make alterations such that it can run on a CUDA device when available.
@@ -41,7 +42,7 @@ def main(argument:str):
     nn_dim = features_train.shape[1] + GNN_DIM
 
     # instantiate model
-    model = NN_Modules.GraphRegressor(GNN_DIM, nn_dim, N_ITER).to(device=device)
+    model = NN_Modules.GraphRegressorV1(GNN_DIM, nn_dim, N_ITER).to(device=device)
     # instantiate optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
@@ -58,7 +59,7 @@ def main(argument:str):
 
         total_loss = 0
         for idx in tqdm(indices):
-            labeli, adji, feati, yi = labels[idx], adjacency[idx].T, features[idx], y[idx]
+            labeli, adji, feati, yi = labels[idx], adjacency[idx], features[idx], y[idx]
 
             # compute output
             optimizer.zero_grad()
@@ -86,11 +87,10 @@ def main(argument:str):
     model.eval()
     predictions = []
     for labeli, adji, feati, yi in tqdm(zip(labels_test, adj_test, features_test, y_test)):
-        out = model(labeli, adji.T, feati)
-        predictions.append(round(out.item()))
+        out = model(labeli, adji, feati)
+        predictions.append(out.item())
     print("actual / predictions : ")
-    for y, pred in zip(y_test, predictions):
-        print((y,pred))
+    metrics.runtime_graph(list(y_test), list(predictions), X_test, f'V1_{argument.split(".")[0]}.png')
 
 if __name__ == '__main__':
     arg = sys.argv[1]
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     if to_file == 'True':
         orig_stdout = sys.stdout
-        with open(f'./Results/exp_{sys.argv[0].split(".")[0]}_{arg.split(".")[0]}.txt', 'w') as wf:
+        with open(f'./Results/Results_runtime/exp_{sys.argv[0].split(".")[0]}_{arg.split(".")[0]}.txt', 'w') as wf:
             with redirect_stdout(wf):
                 main(arg)
     else:

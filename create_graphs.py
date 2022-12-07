@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     files = os.listdir(domain_path)
     # filter out all the pddl files
-    files = list(filter(lambda x: x.split(".")[1] == 'pddl', files))
+    files = list(filter(lambda x: x.split(".")[-1] == 'pddl', files))
     # filter out domain.pddl file (directories with 1 domain for all problems)
     is_domain = lambda x: x.split(".")[0] == "domain"
     one_domain = list(filter(is_domain, files))

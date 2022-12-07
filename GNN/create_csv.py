@@ -13,6 +13,7 @@ def main(file):
 
     # create dictionary of dataframes that will contain all frames.
     dataframes = {}
+    dataframes_regr = {}
     for domain in domains:
         print(domain)
         # create copy of dataframe containing only that specific domain
@@ -70,11 +71,24 @@ def main(file):
 
         # write to csv
         dataframes[domain] = copy
-        copy.to_csv(f'./GNN_data/dataframe_{domain}.csv', index=False)
+        copy.to_csv(f'./GNN_BC_data/{domain}.csv', index=False)
+
+        problems = copy['problem'].unique()
+        regr_df = pd.DataFrame(columns=copy.columns)
+        for i, problem in enumerate(problems):
+            subset = copy[copy.problem == problem]
+            threshold = list(subset['coverage']).index(1)
+            regr_df = pd.concat([regr_df, subset.iloc[threshold].to_frame().T], ignore_index=True)
+        
+        dataframes_regr[domain] = regr_df
+        regr_df.to_csv(f'./GNN_HorizonRegr_data/{domain}.csv', index=False)
+
 
     # write csv of all domains in the file together
     concatenated = pd.concat(list(dataframes.values()))
-    concatenated.to_csv('./GNN_data/complete_dataset.csv', index=False)
+    concatenated.to_csv('./GNN_BC_data/complete_dataset.csv', index=False)
+    concatenated = pd.concat(list(dataframes_regr.values()))
+    concatenated.to_csv('./GNN_HorizonRegr_data/complete_dataset.csv', index=False)
 
 if __name__ == '__main__':
     file = sys.argv[1]
